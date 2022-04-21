@@ -1,0 +1,70 @@
+name: HMPO-demo-pipeline
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      BUILD_NR:
+        description: 'Enter a Build number for your Artifacts'
+        required: true
+        ENVIRONMENT:
+          type: choice
+          description: Please choose the environment you wish to deploy to
+          required: true
+          options: 
+          - development
+          - regression
+          - staging
+          - production
+        ACTION:
+          type: choice
+          description: 'Select Action to perform'
+          required: true
+          options:
+          - build_artifacts_only
+          - deploy_artifacts_only
+          - build_and_deploy
+jobs:
+  set-up:
+    name: Set Up
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+  build-artifacts:
+    name: Building Artifacts
+    runs-on: ubuntu-latest
+    needs: set-up
+    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    steps:
+      - name: Building Artifacts
+        run: |
+          echo "Building some artifacts with build number: ${{ github.event.inputs.BUILD_NR }} and pushing to repository!"
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [ set-up, build-artifacts ]
+    steps:
+      - name: Running Unit Tests against Artifacts
+        run: |
+          echo "running some Unit Tests!"
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [ set-up, build-artifacts, unit-tests ]
+    steps:
+      - name: Running Integration Tests against Artifacts
+        run: |
+          echo "running some Integration Tests!"
+
+  deploy-artifacts:
+    name: Deploy Artifacts
+    runs-on: ubuntu-latest
+    needs: [ set-up, build-artifacts, unit-tests, integration-tests ]
+    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    steps:
+      - name: Deploying Artifacts
+        run: |
+          echo "Deploying ${{ github.event.inputs.BUILD_NR }} to Enrionment: {{ github.event.inputs.BUILD_NR }}"
