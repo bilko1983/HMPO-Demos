@@ -35,9 +35,9 @@ jobs:
     name: Building Artifacts
     runs-on: ubuntu-latest
     needs: set-up
-    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
     steps:
       - name: Building Artifacts
+        if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
         run: |
           echo "Building some artifacts with build number: ${{ github.event.inputs.BUILD_NR }} and pushing to repository!"
 
@@ -63,8 +63,9 @@ jobs:
     name: Deploy Artifacts
     runs-on: ubuntu-latest
     needs: [ set-up, build-artifacts, unit-tests, integration-tests ]
-    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+   
     steps:
       - name: Deploying Artifacts
+        if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
         run: |
           echo "Deploying ${{ github.event.inputs.BUILD_NR }} to Enrionment: {{ github.event.inputs.BUILD_NR }}"
