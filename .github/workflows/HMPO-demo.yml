@@ -6,23 +6,23 @@ on:
       BUILD_NR:
         description: 'Enter a Build number for your Artifacts'
         required: true
-        ENVIRONMENT:
-          type: choice
-          description: Please choose the environment you wish to deploy to
-          required: true
-          options: 
-          - development
-          - regression
-          - staging
-          - production
-        ACTION:
-          type: choice
-          description: 'Select Action to perform'
-          required: true
-          options:
-          - build_artifacts_only
-          - deploy_artifacts_only
-          - build_and_deploy
+      ENVIRONMENT:
+        type: choice
+        description: Please choose the environment you wish to deploy to
+        required: true
+        options: 
+        - development
+        - regression
+        - staging
+        - production
+      ACTION:
+        type: choice
+        description: 'Select Action to perform'
+        required: true
+        options:
+        - build_artifacts_only
+        - deploy_artifacts_only
+        - build_and_deploy
 jobs:
   set-up:
     name: Set Up
