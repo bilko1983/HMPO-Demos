@@ -34,7 +34,6 @@ jobs:
   build-artifacts:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.ACTION != 'deploy_artifacts_only' }}
-    #if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION  == 'build_and_deploy' }}
     name: Building Artifacts
     needs: [ set-up ] 
     steps:
@@ -62,7 +61,7 @@ jobs:
   
   push-artifacts-to-repo:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    if: ${{ github.event.inputs.ACTION != 'deploy_artifacts_only' }}
     name: Push Artifacts to a Repository
     needs: [ integration-tests ]
     steps:
