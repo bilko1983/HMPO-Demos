@@ -32,10 +32,10 @@ jobs:
         uses: actions/checkout@v2
 
   build-artifacts:
-    name: Building Artifacts
     runs-on: ubuntu-latest
-    needs: [ set-up ] 
     if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} && ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    name: Building Artifacts
+    needs: [ set-up ] 
     steps:
       - name: Building Artifacts
         run: |
@@ -60,10 +60,10 @@ jobs:
           echo "running some Integration Tests!"
   
   push-artifacts-to-repo:
-    name: Push Artifacts to a Repository
     runs-on: ubuntu-latest
-    needs: [ integration-tests ]
     if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    name: Push Artifacts to a Repository
+    needs: [ integration-tests ]
     steps:
       - name: Pushing Build Artifacts to a remote repository
         run: |
