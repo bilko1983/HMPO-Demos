@@ -63,7 +63,7 @@ jobs:
   deploy-artifacts:
     name: Deploy Artifacts
     runs-on: ubuntu-latest
-    needs: [ set-up, build-artifacts, unit-tests, integration-tests ]
+    needs: [ set-up ]
     if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }}  
     
     steps:
