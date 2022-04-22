@@ -30,20 +30,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-  deploy-artifacts-only:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} 
-    name: Deploy Artifacts Only
-    steps:
-      - name: Deploying Artifacts
-        run: |
-          echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
           
   build-artifacts:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
     name: Building Artifacts
+    needs: [ set-up ] 
     steps:
       - name: Building Artifacts
         run: |
@@ -82,6 +74,16 @@ jobs:
     if: ${{ github.event.inputs.ACTION == 'build_and_deploy' }} 
     name: Build and Deploy Artifacts
     needs: [ push-artifacts-to-repo ]
+    steps:
+      - name: Deploying Artifacts
+        run: |
+          echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
+
+  deploy-artifacts-only:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} 
+    name: Deploy Artifacts Only
+    needs: [ set-up ]
     steps:
       - name: Deploying Artifacts
         run: |
