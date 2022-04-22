@@ -9,7 +9,7 @@ on:
       ENVIRONMENT:
         type: choice
         description: Please choose the environment you wish to deploy to
-        required: true
+        required: false
         options: 
         - development
         - regression
@@ -35,7 +35,7 @@ jobs:
     name: Building Artifacts
     runs-on: ubuntu-latest
     needs: [ set-up ] 
-    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} && ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
     steps:
       - name: Building Artifacts
         run: |
