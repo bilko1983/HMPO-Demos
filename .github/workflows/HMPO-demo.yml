@@ -40,6 +40,7 @@ jobs:
     steps:
       - name: Building Artifacts
         run: |
+          echo ${{ github.event.inputs.ACTION }}
           echo "Building some artifacts with build number: ${{ github.event.inputs.BUILD_NR }} and pushing to repository!"
 
   unit-tests:
