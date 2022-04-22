@@ -35,7 +35,6 @@ jobs:
     name: Building Artifacts
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
-    
     steps:
       - name: Building Artifacts
         run: |
@@ -58,14 +57,33 @@ jobs:
       - name: Running Integration Tests against Artifacts
         run: |
           echo "running some Integration Tests!"
-
-  deploy-artifacts:
-    name: Deploy Artifacts
+  
+  push-artifacts-to-repo:
+    name: Push Artifacts to a Repository
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
-    
+    needs: [ unit-tests, integration-tests ]
+    if: ${{ github.event.inputs.ACTION == 'build_artifacts_only' }} || ${{ github.event.inputs.ACTION == 'build_and_deploy' }}
+    steps:
+      - name: Pushing Build Artifacts to a remote repository
+        run: |
+          echo "Pushing Build number:${{ github.event.inputs.BUILD_NR }} to a remote repository ready for deployment!"
+
+  deploy-artifacts_with_current_build:
+    runs-on: ubuntu-latest 
+    if: ${{ github.event.inputs.ACTION == 'build_and_deploy' }} 
+    name: Build and Deploy Artifacts
+    needs: [ push-artifacts-to-repo ]
     steps:
       - name: Deploying Artifacts
-
+        run: |
+          echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
+          
+  deploy-artifacts-only:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} 
+    name: Deploy Artifacts
+    needs: [ set-up ]
+    steps:
+      - name: Deploying Artifacts
         run: |
           echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
