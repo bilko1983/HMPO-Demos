@@ -14,7 +14,7 @@ pipeline {
         stage('BUILD ARTIFACTS') {
             when { 
                 not 
-                    { environment name: "ACTION", value: "DEPLOY_ARTIFACTS_ONLY" }
+                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
             }
             steps {
                 BuildArtifacts("${BUILD_NR}")
