@@ -21,11 +21,19 @@ pipeline {
             }
         }
         stage('UNIT TESTS') {
+            when { 
+                not 
+                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
+            }
             steps {
                 UnitTests()
             }
         }
         stage('INTEGRATION TESTS') {
+            when { 
+                not 
+                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
+            }
             steps {
                 IntegrationTests()
             }
