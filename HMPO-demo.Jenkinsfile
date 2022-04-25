@@ -59,23 +59,27 @@ pipeline {
 def BuildArtifacts(buildNr) {
     sh '''
         echo "Building some artifacts with build number: \$buildNr and pushing to repository!"
+        sleep 7s
     '''
 }
 
 def UnitTests() {
     sh '''
         echo "running some Unit Tests!"
+        sleep 7s
     '''
 }
 
 def IntegrationTests() {
     sh '''
         echo "running some Integration Tests!"
+        sleep 7s
     '''
 }
 
 def DeployArtifacts(buildNr, environment) {
     sh '''
         echo "Deploying \$buildNr to Enrionment: \$environment"
+        sleep 7s
     '''
 }
