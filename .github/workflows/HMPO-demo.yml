@@ -1,5 +1,12 @@
 name: HMPO-demo-pipeline
+
 on:
+  push:
+    branches:
+      - 'master'
+      - 'feature/**'
+  schedule:
+    - cron:  '30 6 * * 1-5'
   repository_dispatch:
   workflow_dispatch:
     inputs:
