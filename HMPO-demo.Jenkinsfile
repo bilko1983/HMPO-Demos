@@ -11,46 +11,57 @@ pipeline {
         choice(name: 'ENVIRONMENT', choices: ['DEVELOPMENT', 'REGRESSION', 'STAGING', 'PRODUCTION'], description: 'Please choose the environment you wish to deploy to')
     }
     stages {
-        stage('BUILD ARTIFACTS') {
+        stage ('BUILD ARTIFACTS') {
             when { 
                 not 
-                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
+                    { environment name: "ACTION", value: "DEPLOY_ARTIFACTS_ONLY" }
             }
             steps {
                 BuildArtifacts("${BUILD_NR}")
             }
         }
-        stage('UNIT TESTS') {
-            when { 
-                not 
-                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
-            }
+        stage ('UNIT TESTS') {
             steps {
                 UnitTests()
             }
         }
-        stage('INTEGRATION TESTS') {
-            when { 
-                not 
-                    { environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" }
-            }
+        stage ('INTEGRATION TESTS') {
             steps {
                 IntegrationTests()
             }
         }
         stage ('DEPLOY ARTIFACTS') {
-            agent any
-            environment {
-                LOCAL_VARIABLE = "SOME_LOCAL_VARIABLE"
-            }
-            when { 
-                anyOf { 
-                    environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" 
-                    environment name: "BUILD_AND_DEPLOY", value: "true" 
+            parallel {
+                stage ('DEPLOY TO SERVER-1') {
+                    agent any
+                    environment {
+                        LOCAL_VARIABLE = "SOME_LOCAL_VARIABLE-1"
+                    }
+                    when { 
+                        anyOf { 
+                            environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" 
+                            environment name: "BUILD_AND_DEPLOY", value: "true" 
+                        }
+                    }
+                    steps {
+                        DeployArtifacts("${BUILD_NR}", "${ENVIRONMENT}")
+                    }
                 }
-            }
-            steps {
-                DeployArtifacts("${BUILD_NR}", "${ENVIRONMENT}")
+                stage ('DEPLOY TO SERVER-2') {
+                    agent any
+                    environment {
+                        LOCAL_VARIABLE = "SOME_LOCAL_VARIABL-2"
+                    }
+                    when { 
+                        anyOf { 
+                            environment name: "DEPLOY_ARTIFACTS_ONLY", value: "true" 
+                            environment name: "BUILD_AND_DEPLOY", value: "true" 
+                        }
+                    }
+                    steps {
+                        DeployArtifacts("${BUILD_NR}", "${ENVIRONMENT}")
+                    }
+                }
             }
         }
     }
@@ -59,27 +70,27 @@ pipeline {
 def BuildArtifacts(buildNr) {
     sh '''
         echo "Building some artifacts with build number: \$buildNr and pushing to repository!"
-        sleep 7s
+        sleep 5s
     '''
 }
 
 def UnitTests() {
     sh '''
         echo "running some Unit Tests!"
-        sleep 7s
+        sleep 5s
     '''
 }
 
 def IntegrationTests() {
     sh '''
         echo "running some Integration Tests!"
-        sleep 7s
+        sleep 5s
     '''
 }
 
 def DeployArtifacts(buildNr, environment) {
     sh '''
         echo "Deploying \$buildNr to Enrionment: \$environment"
-        sleep 7s
+        sleep 5s
     '''
 }
