@@ -1,0 +1,86 @@
+name: HMPO-demo-pipeline
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'feature/**'
+  schedule:
+    - cron:  '30 6 * * 1-5'
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      BUILD_NR:
+        description: 'Enter a Build number for your Artifacts'
+        required: true
+      ENVIRONMENT:
+        description: Please choose the environment you wish to deploy to
+        required: false
+      ACTION:
+        description: 'Select Action to perform'
+        required: true
+jobs:
+  set-up:
+    name: Set Up
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+          
+  build-artifacts:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.ACTION != 'deploy_artifacts_only' }}
+    name: Building Artifacts
+    needs: [ set-up ] 
+    steps:
+      - name: Building Artifacts
+        run: |
+          echo "Building some artifacts with build number:${{ github.event.inputs.BUILD_NR }} and pushing to repository!"
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [ set-up, build-artifacts ]
+    steps:
+      - name: Running Unit Tests against Artifacts
+        run: |
+          echo "running some Unit Tests!"
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [ set-up, build-artifacts, unit-tests ]
+    steps:
+      - name: Running Integration Tests against Artifacts
+        run: |
+          echo "running some Integration Tests!"
+  
+  push-artifacts-to-repo:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.ACTION != 'deploy_artifacts_only' }}
+    name: Push Artifacts to a Repository
+    needs: [ integration-tests ]
+    steps:
+      - name: Pushing Build Artifacts to a remote repository
+        run: |
+          echo "Pushing Build number:${{ github.event.inputs.BUILD_NR }} to a remote repository ready for deployment!"
+
+  deploy-artifacts_with_current_build:
+    runs-on: ubuntu-latest 
+    if: ${{ github.event.inputs.ACTION == 'build_and_deploy' }} 
+    name: Build and Deploy Artifacts
+    needs: [ push-artifacts-to-repo ]
+    steps:
+      - name: Deploying Artifacts
+        run: |
+          echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
+
+  deploy-artifacts-only:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.ACTION == 'deploy_artifacts_only' }} 
+    name: Deploy Artifacts Only
+    needs: [ set-up ]
+    steps:
+      - name: Deploying Artifacts
+        run: |
+          echo "Deploying build number:${{ github.event.inputs.BUILD_NR }} to Enrionment:{{ github.event.inputs.BUILD_NR }}"
