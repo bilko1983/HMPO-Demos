@@ -1,0 +1,25 @@
+name: Test Pipeline
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      TF_action:
+        description: Test Input
+        required: true
+      Environment:
+        description: Environment
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+  test_echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Pipeline
+        run: |
+          echo "This is a test pipeline with inputs: ${{ github.event.inputs.TF_action }} and ${{ github.event.inputs.Environment }}"
